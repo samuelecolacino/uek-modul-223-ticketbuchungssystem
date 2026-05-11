@@ -13,4 +13,4 @@ public enum TicketPurchaseStatus
     ConcurrencyConflict
 }
 
-public record TicketPurchaseResult(TicketPurchaseStatus Status, int TicketId, int? UserId, string? Message);
+public record TicketPurchaseResult(TicketPurchaseStatus Status, int TicketId, int? UserId, string? Message, int? CategoryId = null);

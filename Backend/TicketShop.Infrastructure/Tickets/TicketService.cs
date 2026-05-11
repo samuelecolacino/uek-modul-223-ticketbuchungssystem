@@ -18,20 +18,30 @@ public class TicketService : ITicketService
 
     public async Task<IReadOnlyList<AvailableCategoryDto>> GetAvailableGroupedAsync(CancellationToken ct = default)
     {
-        var grouped = await _context.Tickets
+        var categories = await _context.TicketCategories
             .AsNoTracking()
-            .Where(t => !t.IsSold)
-            .Include(t => t.Category)
-            .GroupBy(t => new { t.TicketCategoryId, t.Category!.Name, t.Category.Price })
-            .Select(g => new AvailableCategoryDto(
-                g.Key.TicketCategoryId,
-                g.Key.Name,
-                g.Key.Price,
-                g.Count(),
-                g.Select(t => t.Id).ToList()))
+            .OrderBy(c => c.Id)
             .ToListAsync(ct);
 
-        return grouped;
+        var availableByCategory = await _context.Tickets
+            .AsNoTracking()
+            .Where(t => !t.IsSold)
+            .GroupBy(t => t.TicketCategoryId)
+            .Select(g => new
+            {
+                CategoryId = g.Key,
+                Count = g.Count(),
+                TicketIds = g.OrderBy(t => t.Id).Select(t => t.Id).ToList()
+            })
+            .ToListAsync(ct);
+
+        var lookup = availableByCategory.ToDictionary(x => x.CategoryId);
+
+        return categories
+            .Select(c => lookup.TryGetValue(c.Id, out var a)
+                ? new AvailableCategoryDto(c.Id, c.Name, c.Price, a.Count, a.TicketIds)
+                : new AvailableCategoryDto(c.Id, c.Name, c.Price, 0, Array.Empty<int>()))
+            .ToList();
     }
 
     public async Task<TicketPurchaseResult> BuyAsync(int ticketId, int userId, CancellationToken ct = default)
@@ -57,6 +67,6 @@ public class TicketService : ITicketService
         }
 
         await transaction.CommitAsync(ct);
-        return new TicketPurchaseResult(TicketPurchaseStatus.Success, ticketId, userId, null);
+        return new TicketPurchaseResult(TicketPurchaseStatus.Success, ticketId, userId, null, ticket.TicketCategoryId);
     }
 }

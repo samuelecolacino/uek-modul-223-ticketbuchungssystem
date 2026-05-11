@@ -30,7 +30,7 @@ public class TicketServiceTests
     }
 
     [Fact]
-    public async Task GetAvailableGrouped_ReturnsOnlyUnsoldTicketsGroupedByCategory()
+    public async Task GetAvailableGrouped_ReturnsAllCategoriesEvenWhenSoldOut()
     {
         using var factory = new SqliteTestDbFactory();
         SeedBaseFixture(factory);
@@ -40,12 +40,17 @@ public class TicketServiceTests
 
         var result = await service.GetAvailableGroupedAsync();
 
-        result.Should().HaveCount(1);
-        var vip = result.Single();
-        vip.CategoryId.Should().Be(1);
+        result.Should().HaveCount(2);
+
+        var vip = result.Single(c => c.CategoryId == 1);
         vip.Name.Should().Be("VIP");
         vip.AvailableCount.Should().Be(2);
         vip.TicketIds.Should().BeEquivalentTo(new[] { 1, 2 });
+
+        var standard = result.Single(c => c.CategoryId == 2);
+        standard.Name.Should().Be("Standard");
+        standard.AvailableCount.Should().Be(0);
+        standard.TicketIds.Should().BeEmpty();
     }
 
     [Fact]
