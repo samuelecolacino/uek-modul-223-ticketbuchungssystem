@@ -27,6 +27,7 @@ public class AppDbContext : DbContext
         {
             b.Property(c => c.Name).IsRequired().HasMaxLength(64);
             b.Property(c => c.Price).HasColumnType("decimal(18,2)");
+            b.Property(c => c.IsAdminOnly).HasDefaultValue(false);
         });
 
         modelBuilder.Entity<Ticket>(b =>
