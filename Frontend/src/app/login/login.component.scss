@@ -1,0 +1,76 @@
+.login {
+  max-width: 360px;
+  margin: 4rem auto;
+  padding: 2rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  font-family: system-ui, sans-serif;
+
+  h1 {
+    margin: 0 0 1.25rem;
+    font-size: 1.5rem;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.9rem;
+
+    input {
+      padding: 0.55rem 0.7rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+
+      &:focus {
+        outline: 2px solid #2563eb;
+        outline-offset: 1px;
+      }
+    }
+  }
+
+  button {
+    padding: 0.65rem 1rem;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+
+    &:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+  }
+
+  .error {
+    margin: 0;
+    padding: 0.6rem 0.75rem;
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+
+  .hint {
+    margin-top: 1.5rem;
+    color: #6b7280;
+    font-size: 0.85rem;
+
+    code {
+      background: #f3f4f6;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+  }
+}

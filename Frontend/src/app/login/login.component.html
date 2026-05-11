@@ -1,0 +1,25 @@
+<section class="login">
+  <h1>TicketShop Login</h1>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <label>
+      <span>Benutzername</span>
+      <input type="text" formControlName="username" autocomplete="username" />
+    </label>
+
+    <label>
+      <span>Passwort</span>
+      <input type="password" formControlName="password" autocomplete="current-password" />
+    </label>
+
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+
+    <button type="submit" [disabled]="form.invalid || loading()">
+      {{ loading() ? 'Lade...' : 'Anmelden' }}
+    </button>
+  </form>
+
+  <p class="hint">Test-Konten: <code>admin / admin</code> &middot; <code>user / user</code></p>
+</section>
