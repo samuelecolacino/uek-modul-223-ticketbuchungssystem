@@ -1,5 +1,8 @@
 # TicketShop Applikation
 
+# WICHTIG !!!!
+Ich Habe dieses Readme mit KI generiert um mermaid mal zu testen die anleitung um das Projekt zu starten und die Doku habe ich selbst geschrieben und als PDF im abgabe ordner hinzugefügt
+
 > Applikation zum simultanen Verkauf von Tickets mit Concurrency Control.
 
 ---
