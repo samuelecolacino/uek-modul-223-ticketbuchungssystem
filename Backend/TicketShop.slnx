@@ -3,4 +3,5 @@
   <Project Path="TicketShop.Application/TicketShop.Application.csproj" />
   <Project Path="TicketShop.Core/TicketShop.Core.csproj" />
   <Project Path="TicketShop.Infrastructure/TicketShop.Infrastructure.csproj" />
+  <Project Path="TicketShop.Tests/TicketShop.Tests.csproj" />
 </Solution>
