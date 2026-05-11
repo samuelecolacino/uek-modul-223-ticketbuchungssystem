@@ -42,6 +42,11 @@ public class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.SetNull);
 
             b.Property(t => t.RowVersion).IsRowVersion();
+
+            if (Database.ProviderName?.EndsWith(".Sqlite", StringComparison.Ordinal) == true)
+            {
+                b.Property(t => t.RowVersion).ValueGeneratedNever();
+            }
         });
     }
 }

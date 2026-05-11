@@ -55,7 +55,6 @@ internal sealed class SqliteTestDbFactory : IDisposable
         return new DbContextOptionsBuilder<AppDbContext>()
             .UseSqlite(connection)
             .AddInterceptors(new RowVersionInterceptor())
-            .EnableSensitiveDataLogging()
             .Options;
     }
 

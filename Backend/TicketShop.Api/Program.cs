@@ -24,6 +24,11 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddDefaultDbContext(builder.Configuration);
+}
+
 builder.Services.AddValidatorsFromAssemblyContaining<BuyTicketDtoValidator>();
 
 var jwtSection = builder.Configuration.GetSection(JwtSettings.SectionName);
@@ -73,8 +78,9 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+if (!app.Environment.IsEnvironment("Testing"))
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await DbSeeder.SeedAsync(db);
 }
@@ -92,3 +98,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program;
