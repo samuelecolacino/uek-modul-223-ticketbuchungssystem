@@ -137,7 +137,7 @@ Repository klonen und in den Projekt-Root wechseln, dann in dieser Reihenfolge:
 docker compose up -d
 ```
 
-Startet den Container `ticketshop-mssql` (SQL Server 2022) auf Port `1433`. SA-Passwort: `DeinSicheresPasswort123!`. Die Daten liegen persistent im benannten Volume `mssql_data`.
+Startet den Container `ticketshop-mssql` (SQL Server 2022) auf Port `1433`. SA-Passwort: `Passwort123!`. Die Daten liegen persistent im benannten Volume `mssql_data`.
 
 ### 2. Backend starten
 
