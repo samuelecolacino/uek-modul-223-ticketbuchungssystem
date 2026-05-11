@@ -21,6 +21,7 @@ internal sealed class RowVersionInterceptor : SaveChangesInterceptor
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
+    //KI GENERIERT: BumpVersions, damit die RowVersion bei jedem Speichern aktualisiert wird, da in den Tests keine echte Datenbank verwendet wird, die dies automatisch erledigt.
     private static void BumpVersions(DbContext? context)
     {
         if (context is null)

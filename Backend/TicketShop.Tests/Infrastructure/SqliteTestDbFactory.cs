@@ -5,6 +5,7 @@ using TicketShop.Infrastructure.Persistence;
 
 namespace TicketShop.Tests.Infrastructure;
 
+//KI GENERIERT - Diese Klasse SqliteTestDbFactory ist eine Testdatenbankfabrik, die eine In-Memory-SQLite-Datenbank erstellt und verwaltet. Sie ermöglicht das Erstellen von AppDbContext-Instanzen für Tests, das Seeden von Testdaten und stellt sicher, dass die Datenbankverbindung während der gesamten Testlaufzeit offen bleibt, um die Lebensdauer der In-Memory-Datenbank zu gewährleisten.
 internal sealed class SqliteTestDbFactory : IDisposable
 {
     private readonly string _dataSource = $"file:{Guid.NewGuid():N}?mode=memory&cache=shared";
