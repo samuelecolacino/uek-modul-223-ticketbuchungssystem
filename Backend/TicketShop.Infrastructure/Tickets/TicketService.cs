@@ -9,6 +9,9 @@ public class TicketService : ITicketService
     private const string ConcurrencyMessage =
         "Das Ticket wurde in der Zwischenzeit von einem anderen Benutzer gekauft.";
 
+    private const string ForbiddenMessage =
+        "Dieses Ticket ist nur für Administratoren verfügbar.";
+
     private readonly AppDbContext _context;
 
     public TicketService(AppDbContext context)
@@ -16,10 +19,15 @@ public class TicketService : ITicketService
         _context = context;
     }
 
-    public async Task<IReadOnlyList<AvailableCategoryDto>> GetAvailableGroupedAsync(CancellationToken ct = default)
+    public async Task<IReadOnlyList<AvailableCategoryDto>> GetAvailableGroupedAsync(bool includeAdminOnly, CancellationToken ct = default)
     {
-        var categories = await _context.TicketCategories
-            .AsNoTracking()
+        var categoryQuery = _context.TicketCategories.AsNoTracking();
+        if (!includeAdminOnly)
+        {
+            categoryQuery = categoryQuery.Where(c => !c.IsAdminOnly);
+        }
+
+        var categories = await categoryQuery
             .OrderBy(c => c.Id)
             .ToListAsync(ct);
 
@@ -39,19 +47,26 @@ public class TicketService : ITicketService
 
         return categories
             .Select(c => lookup.TryGetValue(c.Id, out var a)
-                ? new AvailableCategoryDto(c.Id, c.Name, c.Price, a.Count, a.TicketIds)
-                : new AvailableCategoryDto(c.Id, c.Name, c.Price, 0, Array.Empty<int>()))
+                ? new AvailableCategoryDto(c.Id, c.Name, c.Price, a.Count, a.TicketIds, c.IsAdminOnly)
+                : new AvailableCategoryDto(c.Id, c.Name, c.Price, 0, Array.Empty<int>(), c.IsAdminOnly))
             .ToList();
     }
 
-    public async Task<TicketPurchaseResult> BuyAsync(int ticketId, int userId, CancellationToken ct = default)
+    public async Task<TicketPurchaseResult> BuyAsync(int ticketId, int userId, bool isAdmin, CancellationToken ct = default)
     {
         using var transaction = await _context.Database.BeginTransactionAsync(ct);
 
-        var ticket = _context.Tickets.FirstOrDefault(t => t.Id == ticketId && t.IsSold == false);
+        var ticket = await _context.Tickets
+            .Include(t => t.Category)
+            .FirstOrDefaultAsync(t => t.Id == ticketId && t.IsSold == false, ct);
         if (ticket is null)
         {
             return new TicketPurchaseResult(TicketPurchaseStatus.NotFoundOrAlreadySold, ticketId, null, "Ticket already sold");
+        }
+
+        if (ticket.Category.IsAdminOnly && !isAdmin)
+        {
+            return new TicketPurchaseResult(TicketPurchaseStatus.Forbidden, ticketId, null, ForbiddenMessage);
         }
 
         ticket.IsSold = true;

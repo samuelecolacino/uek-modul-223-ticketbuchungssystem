@@ -2,15 +2,16 @@ namespace TicketShop.Application.Tickets;
 
 public interface ITicketService
 {
-    Task<IReadOnlyList<AvailableCategoryDto>> GetAvailableGroupedAsync(CancellationToken ct = default);
-    Task<TicketPurchaseResult> BuyAsync(int ticketId, int userId, CancellationToken ct = default);
+    Task<IReadOnlyList<AvailableCategoryDto>> GetAvailableGroupedAsync(bool includeAdminOnly, CancellationToken ct = default);
+    Task<TicketPurchaseResult> BuyAsync(int ticketId, int userId, bool isAdmin, CancellationToken ct = default);
 }
 
 public enum TicketPurchaseStatus
 {
     Success,
     NotFoundOrAlreadySold,
-    ConcurrencyConflict
+    ConcurrencyConflict,
+    Forbidden
 }
 
 public record TicketPurchaseResult(TicketPurchaseStatus Status, int TicketId, int? UserId, string? Message, int? CategoryId = null);

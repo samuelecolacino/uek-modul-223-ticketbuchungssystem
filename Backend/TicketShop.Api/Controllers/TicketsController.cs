@@ -13,6 +13,8 @@ namespace TicketShop.Api.Controllers;
 [Authorize]
 public class TicketsController : ControllerBase
 {
+    private const string AdminRole = "Admin";
+
     private readonly ITicketService _ticketService;
     private readonly IValidator<BuyTicketDto> _buyValidator;
     private readonly IHubContext<TicketHub> _hub;
@@ -30,7 +32,7 @@ public class TicketsController : ControllerBase
     [HttpGet("available")]
     public async Task<ActionResult<IReadOnlyList<AvailableCategoryDto>>> GetAvailable(CancellationToken ct)
     {
-        var categories = await _ticketService.GetAvailableGroupedAsync(ct);
+        var categories = await _ticketService.GetAvailableGroupedAsync(includeAdminOnly: User.IsInRole(AdminRole), ct);
         return Ok(categories);
     }
 
@@ -54,7 +56,7 @@ public class TicketsController : ControllerBase
             return Unauthorized(new { message = "Ungültiges Token: Benutzer-ID fehlt." });
         }
 
-        var result = await _ticketService.BuyAsync(request.TicketId, userId, ct);
+        var result = await _ticketService.BuyAsync(request.TicketId, userId, isAdmin: User.IsInRole(AdminRole), ct);
 
         if (result.Status == TicketPurchaseStatus.Success)
         {
@@ -69,6 +71,7 @@ public class TicketsController : ControllerBase
             TicketPurchaseStatus.Success => Ok(new { ticketId = result.TicketId, userId = result.UserId, categoryId = result.CategoryId }),
             TicketPurchaseStatus.NotFoundOrAlreadySold => NotFound(new { message = "Ticket nicht verfügbar oder bereits verkauft." }),
             TicketPurchaseStatus.ConcurrencyConflict => Conflict(new { message = result.Message }),
+            TicketPurchaseStatus.Forbidden => StatusCode(StatusCodes.Status403Forbidden, new { message = result.Message }),
             _ => StatusCode(StatusCodes.Status500InternalServerError)
         };
     }
