@@ -9,6 +9,9 @@ namespace TicketShop.Tests;
 
 public class TicketServiceConcurrencyTests
 {
+
+    //Kommentarte zu den Tests sind KI GENERIERT !!
+
     private const string ConcurrencyMessage =
         "Das Ticket wurde in der Zwischenzeit von einem anderen Benutzer gekauft.";
 
@@ -45,8 +48,8 @@ public class TicketServiceConcurrencyTests
 
         // Task.WhenAll fires both BuyAsync calls in parallel — Phase-2 spec requirement.
         var results = await Task.WhenAll(
-            Task.Run(() => serviceA.BuyAsync(ticketId: 1, userId: 100)),
-            Task.Run(() => serviceB.BuyAsync(ticketId: 1, userId: 200)));
+            Task.Run(() => serviceA.BuyAsync(ticketId: 1, userId: 100, isAdmin: false)),
+            Task.Run(() => serviceB.BuyAsync(ticketId: 1, userId: 200, isAdmin: false)));
 
         // The winning service returns Success.
         results.Should().ContainSingle(r => r.Status == TicketPurchaseStatus.Success);
@@ -67,7 +70,7 @@ public class TicketServiceConcurrencyTests
         using var ctx = factory.CreateThrowingContext();
         var service = new TicketService(ctx);
 
-        var result = await service.BuyAsync(ticketId: 1, userId: 1);
+        var result = await service.BuyAsync(ticketId: 1, userId: 1, isAdmin: false);
 
         result.Status.Should().Be(TicketPurchaseStatus.ConcurrencyConflict);
         result.Message.Should().Be(ConcurrencyMessage);
