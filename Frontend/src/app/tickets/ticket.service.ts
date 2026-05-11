@@ -9,6 +9,7 @@ export interface AvailableCategory {
   price: number;
   availableCount: number;
   ticketIds: number[];
+  isAdminOnly: boolean;
 }
 
 export interface BuyTicketResponse {

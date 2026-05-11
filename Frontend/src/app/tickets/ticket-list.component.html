@@ -34,21 +34,29 @@
     <p>Wähle eine Kategorie und kaufe ein Ticket. Bestände aktualisieren sich live.</p>
   </header>
 
-  @if (loading() && categories().length === 0) {
+  @if (loading() && visibleCategories().length === 0) {
     <div class="loading">
       <mat-progress-spinner mode="indeterminate" diameter="36" />
     </div>
-  } @else if (categories().length === 0) {
+  } @else if (visibleCategories().length === 0) {
     <p class="empty">Aktuell sind keine Kategorien konfiguriert.</p>
   } @else {
     <section class="grid">
-      @for (category of categories(); track category.categoryId) {
+      @for (category of visibleCategories(); track category.categoryId) {
         @let soldOut = category.availableCount === 0;
         @let busy = buyingCategoryId() === category.categoryId;
 
-        <mat-card appearance="outlined" class="category" [class.category--sold-out]="soldOut">
+        <mat-card appearance="outlined" class="category" [class.category--sold-out]="soldOut" [class.category--admin]="category.isAdminOnly">
           <mat-card-header>
-            <mat-card-title>{{ category.name }}</mat-card-title>
+            <mat-card-title>
+              {{ category.name }}
+              @if (category.isAdminOnly) {
+                <mat-chip class="admin-chip" disableRipple highlighted color="accent">
+                  <mat-icon matChipAvatar>shield</mat-icon>
+                  Admin
+                </mat-chip>
+              }
+            </mat-card-title>
             <mat-card-subtitle>CHF {{ category.price | number:'1.2-2' }}</mat-card-subtitle>
           </mat-card-header>
 

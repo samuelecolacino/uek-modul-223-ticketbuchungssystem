@@ -106,6 +106,20 @@
     opacity: 0.72;
   }
 
+  &--admin {
+    border-color: #7c3aed;
+    background: linear-gradient(180deg, rgba(124, 58, 237, 0.04), transparent 60%);
+  }
+
+  .admin-chip {
+    margin-left: 0.5rem;
+    font-size: 0.7rem;
+    height: 22px;
+    vertical-align: middle;
+
+    mat-icon { font-size: 14px; width: 14px; height: 14px; }
+  }
+
   mat-card-title {
     font-size: 1.15rem;
     font-weight: 500;

@@ -41,6 +41,11 @@ export class TicketListComponent implements OnInit {
   readonly loading = signal(false);
   readonly buyingCategoryId = signal<number | null>(null);
   readonly username = computed(() => this.auth.username());
+  readonly isAdmin = computed(() => this.auth.isAdmin());
+  readonly visibleCategories = computed(() =>
+    this.isAdmin()
+      ? this.categories()
+      : this.categories().filter(c => !c.isAdminOnly));
   readonly liveConnected = this.signalr.connected;
 
   ngOnInit(): void {
@@ -97,6 +102,8 @@ export class TicketListComponent implements OnInit {
           this.openError('Achtung: Jemand war schneller! Bitte erneut versuchen.');
         } else if (err.status === 404) {
           this.openError('Ticket nicht verfügbar oder bereits verkauft.');
+        } else if (err.status === 403) {
+          this.openError('Zugriff verweigert: Dieses Ticket ist nur für Administratoren verfügbar.');
         } else if (err.status === 401) {
           this.auth.logout();
           this.router.navigateByUrl('/login');

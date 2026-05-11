@@ -47,6 +47,28 @@ export class AuthService {
     return this.getToken() !== null;
   }
 
+  isAdmin(): boolean {
+    const token = this.getToken();
+    if (!token) {
+      return false;
+    }
+    try {
+      const payloadSegment = token.split('.')[1];
+      if (!payloadSegment) {
+        return false;
+      }
+      const padded = payloadSegment.replace(/-/g, '+').replace(/_/g, '/');
+      const payload = JSON.parse(atob(padded));
+      const claim =
+        payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ??
+        payload['role'];
+      const roles = Array.isArray(claim) ? claim : [claim];
+      return roles.includes('Admin');
+    } catch {
+      return false;
+    }
+  }
+
   private setSession(response: LoginResponse): void {
     localStorage.setItem(TOKEN_KEY, response.token);
     localStorage.setItem(USERNAME_KEY, response.username);
