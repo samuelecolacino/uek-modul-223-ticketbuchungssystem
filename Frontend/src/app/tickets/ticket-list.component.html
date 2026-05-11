@@ -1,0 +1,41 @@
+<section class="ticket-list">
+  <header>
+    <h1>Verfügbare Tickets</h1>
+    <div class="user">
+      @if (username()) {
+        <span>Angemeldet als <strong>{{ username() }}</strong></span>
+      }
+      <button type="button" class="link" (click)="logout()">Abmelden</button>
+    </div>
+  </header>
+
+  @if (toast(); as t) {
+    <div class="toast" [class.toast--error]="t.kind === 'error'" [class.toast--success]="t.kind === 'success'" role="alert">
+      {{ t.message }}
+    </div>
+  }
+
+  @if (loading() && categories().length === 0) {
+    <p class="status">Lade Tickets...</p>
+  } @else if (categories().length === 0) {
+    <p class="status">Aktuell sind keine Tickets verfügbar.</p>
+  } @else {
+    <div class="grid">
+      @for (category of categories(); track category.categoryId) {
+        <article class="card">
+          <h2>{{ category.name }}</h2>
+          <p class="price">CHF {{ category.price | number:'1.2-2' }}</p>
+          <p class="count">
+            <strong>{{ category.availableCount }}</strong> Tickets verfügbar
+          </p>
+          <button
+            type="button"
+            (click)="buyFirst(category)"
+            [disabled]="category.availableCount === 0 || buyingCategoryId() !== null">
+            {{ buyingCategoryId() === category.categoryId ? 'Kaufe...' : '1 Ticket kaufen' }}
+          </button>
+        </article>
+      }
+    </div>
+  }
+</section>
