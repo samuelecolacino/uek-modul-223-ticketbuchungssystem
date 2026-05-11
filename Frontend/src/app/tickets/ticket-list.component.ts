@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
@@ -13,7 +14,7 @@ interface Toast {
 
 @Component({
   selector: 'app-ticket-list',
-  imports: [],
+  imports: [DecimalPipe],
   templateUrl: './ticket-list.component.html',
   styleUrl: './ticket-list.component.scss'
 })
