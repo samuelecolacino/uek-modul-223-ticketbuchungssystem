@@ -1,8 +1,10 @@
 import { DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
+import { SignalRService, TicketSoldEvent } from './signalr.service';
 import { AvailableCategory, TicketService } from './ticket.service';
 
 type ToastKind = 'success' | 'error';
@@ -22,6 +24,8 @@ export class TicketListComponent implements OnInit {
   private readonly tickets = inject(TicketService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly signalr = inject(SignalRService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly categories = signal<AvailableCategory[]>([]);
   readonly loading = signal(false);
@@ -31,6 +35,22 @@ export class TicketListComponent implements OnInit {
 
   ngOnInit(): void {
     this.reload();
+
+    this.signalr.ticketSold$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(event => this.applyTicketSold(event));
+  }
+
+  private applyTicketSold(event: TicketSoldEvent): void {
+    this.categories.update(list =>
+      list.map(c =>
+        c.categoryId === event.categoryId
+          ? {
+              ...c,
+              availableCount: Math.max(0, c.availableCount - 1),
+              ticketIds: c.ticketIds.filter(id => id !== event.ticketId)
+            }
+          : c));
   }
 
   reload(): void {

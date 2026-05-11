@@ -22,17 +22,21 @@
   } @else {
     <div class="grid">
       @for (category of categories(); track category.categoryId) {
-        <article class="card">
+        <article class="card" [class.card--sold-out]="category.availableCount === 0">
           <h2>{{ category.name }}</h2>
           <p class="price">CHF {{ category.price | number:'1.2-2' }}</p>
-          <p class="count">
-            <strong>{{ category.availableCount }}</strong> Tickets verfügbar
-          </p>
+          @if (category.availableCount === 0) {
+            <p class="sold-out">Ausverkauft</p>
+          } @else {
+            <p class="count"><strong>{{ category.availableCount }}</strong> Tickets verfügbar</p>
+          }
           <button
             type="button"
             (click)="buyFirst(category)"
             [disabled]="category.availableCount === 0 || buyingCategoryId() !== null">
-            {{ buyingCategoryId() === category.categoryId ? 'Kaufe...' : '1 Ticket kaufen' }}
+            {{ category.availableCount === 0
+                ? 'Ausverkauft'
+                : (buyingCategoryId() === category.categoryId ? 'Kaufe...' : '1 Ticket kaufen') }}
           </button>
         </article>
       }
