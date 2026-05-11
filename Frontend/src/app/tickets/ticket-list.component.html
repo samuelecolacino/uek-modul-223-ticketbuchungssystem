@@ -1,45 +1,90 @@
-<section class="ticket-list">
-  <header>
+<mat-toolbar class="toolbar">
+  <span class="brand">
+    <mat-icon aria-hidden="true">confirmation_number</mat-icon>
+    <span>TicketShop</span>
+  </span>
+
+  <span class="spacer"></span>
+
+  <span class="status">
+    <mat-icon
+      class="live-dot"
+      [class.live-dot--on]="liveConnected()"
+      [title]="liveConnected() ? 'Live verbunden' : 'Offline'"
+      aria-hidden="true">circle</mat-icon>
+    <span class="live-label">{{ liveConnected() ? 'Live' : 'Offline' }}</span>
+  </span>
+
+  @if (username()) {
+    <span class="user">
+      <mat-icon aria-hidden="true">person</mat-icon>
+      <span>{{ username() }}</span>
+    </span>
+  }
+
+  <button mat-button (click)="logout()" aria-label="Abmelden">
+    <mat-icon>logout</mat-icon>
+    <span>Abmelden</span>
+  </button>
+</mat-toolbar>
+
+<main class="page">
+  <header class="page-header">
     <h1>Verfügbare Tickets</h1>
-    <div class="user">
-      @if (username()) {
-        <span>Angemeldet als <strong>{{ username() }}</strong></span>
-      }
-      <button type="button" class="link" (click)="logout()">Abmelden</button>
-    </div>
+    <p>Wähle eine Kategorie und kaufe ein Ticket. Bestände aktualisieren sich live.</p>
   </header>
 
-  @if (toast(); as t) {
-    <div class="toast" [class.toast--error]="t.kind === 'error'" [class.toast--success]="t.kind === 'success'" role="alert">
-      {{ t.message }}
-    </div>
-  }
-
   @if (loading() && categories().length === 0) {
-    <p class="status">Lade Tickets...</p>
-  } @else if (categories().length === 0) {
-    <p class="status">Aktuell sind keine Tickets verfügbar.</p>
-  } @else {
-    <div class="grid">
-      @for (category of categories(); track category.categoryId) {
-        <article class="card" [class.card--sold-out]="category.availableCount === 0">
-          <h2>{{ category.name }}</h2>
-          <p class="price">CHF {{ category.price | number:'1.2-2' }}</p>
-          @if (category.availableCount === 0) {
-            <p class="sold-out">Ausverkauft</p>
-          } @else {
-            <p class="count"><strong>{{ category.availableCount }}</strong> Tickets verfügbar</p>
-          }
-          <button
-            type="button"
-            (click)="buyFirst(category)"
-            [disabled]="category.availableCount === 0 || buyingCategoryId() !== null">
-            {{ category.availableCount === 0
-                ? 'Ausverkauft'
-                : (buyingCategoryId() === category.categoryId ? 'Kaufe...' : '1 Ticket kaufen') }}
-          </button>
-        </article>
-      }
+    <div class="loading">
+      <mat-progress-spinner mode="indeterminate" diameter="36" />
     </div>
+  } @else if (categories().length === 0) {
+    <p class="empty">Aktuell sind keine Kategorien konfiguriert.</p>
+  } @else {
+    <section class="grid">
+      @for (category of categories(); track category.categoryId) {
+        @let soldOut = category.availableCount === 0;
+        @let busy = buyingCategoryId() === category.categoryId;
+
+        <mat-card appearance="outlined" class="category" [class.category--sold-out]="soldOut">
+          <mat-card-header>
+            <mat-card-title>{{ category.name }}</mat-card-title>
+            <mat-card-subtitle>CHF {{ category.price | number:'1.2-2' }}</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content class="content">
+            @if (soldOut) {
+              <mat-chip class="sold-out-chip" disableRipple highlighted color="warn">
+                <mat-icon matChipAvatar>block</mat-icon>
+                Ausverkauft
+              </mat-chip>
+            } @else {
+              <div class="count">
+                <span class="count-value">{{ category.availableCount }}</span>
+                <span class="count-label">Tickets verfügbar</span>
+              </div>
+            }
+          </mat-card-content>
+
+          <mat-card-actions align="end">
+            @if (busy) {
+              <button mat-flat-button color="primary" disabled>
+                <mat-progress-spinner mode="indeterminate" diameter="18" />
+              </button>
+            } @else if (soldOut) {
+              <button mat-flat-button color="warn" disabled>
+                <mat-icon>block</mat-icon>
+                Ausverkauft
+              </button>
+            } @else {
+              <button mat-flat-button color="primary" (click)="buyFirst(category)">
+                <mat-icon>shopping_cart</mat-icon>
+                1 Ticket kaufen
+              </button>
+            }
+          </mat-card-actions>
+        </mat-card>
+      }
+    </section>
   }
-</section>
+</main>

@@ -1,110 +1,167 @@
-.ticket-list {
-  max-width: 960px;
-  margin: 2rem auto;
-  padding: 0 1.25rem;
-  font-family: system-ui, sans-serif;
+.toolbar {
+  background: #ffffff;
+  color: #1f2937;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  gap: 0.75rem;
 
-  header {
-    display: flex;
+  .brand {
+    display: inline-flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-
-    h1 {
-      margin: 0;
-      font-size: 1.6rem;
-    }
-
-    .user {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      font-size: 0.9rem;
-      color: #374151;
-    }
-
-    .link {
-      background: none;
-      border: none;
-      color: #2563eb;
-      cursor: pointer;
-      font-size: 0.9rem;
-      padding: 0;
-      text-decoration: underline;
-    }
-  }
-
-  .toast {
-    margin-bottom: 1.25rem;
-    padding: 0.85rem 1rem;
-    border-radius: 6px;
+    gap: 0.5rem;
     font-weight: 500;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    letter-spacing: 0.02em;
 
-    &--error {
-      background: #fee2e2;
-      color: #991b1b;
-      border-left: 4px solid #dc2626;
-    }
-
-    &--success {
-      background: #dcfce7;
-      color: #166534;
-      border-left: 4px solid #16a34a;
-    }
+    mat-icon { color: #2563eb; }
   }
+
+  .spacer { flex: 1 1 auto; }
 
   .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
     color: #6b7280;
-    font-style: italic;
+
+    .live-dot {
+      font-size: 12px;
+      width: 12px;
+      height: 12px;
+      color: #9ca3af;
+      transition: color 200ms ease;
+
+      &--on { color: #16a34a; }
+    }
   }
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1rem;
+  .user {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.9rem;
+    color: #374151;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+
+  h1 {
+    margin: 0 0 0.35rem;
+    font-size: 1.75rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
   }
 
-  .card {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 1.25rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  p {
+    margin: 0;
+    color: #6b7280;
+  }
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 0;
+}
+
+.empty {
+  color: #6b7280;
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.category {
+  display: flex;
+  flex-direction: column;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  }
+
+  &--sold-out {
+    opacity: 0.72;
+  }
+
+  mat-card-title {
+    font-size: 1.15rem;
+    font-weight: 500;
+  }
+
+  mat-card-subtitle {
+    color: #2563eb;
+    font-weight: 500;
+  }
+
+  .content {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+    min-height: 96px;
+  }
+
+  .count {
     display: flex;
     flex-direction: column;
-    gap: 0.55rem;
+    align-items: center;
+    line-height: 1.2;
 
-    h2 {
-      margin: 0;
-      font-size: 1.2rem;
+    .count-value {
+      font-size: 2.25rem;
+      font-weight: 500;
+      color: #111827;
     }
 
-    .price {
-      margin: 0;
-      color: #2563eb;
-      font-weight: 600;
+    .count-label {
+      margin-top: 0.2rem;
+      font-size: 0.85rem;
+      color: #6b7280;
     }
+  }
 
-    .count {
-      margin: 0;
-      color: #374151;
-    }
+  .sold-out-chip {
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
 
-    button {
-      margin-top: 0.5rem;
-      padding: 0.6rem 1rem;
-      background: #16a34a;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      font-size: 0.95rem;
-      cursor: pointer;
+  mat-card-actions {
+    padding: 0.5rem 1rem 1rem;
+  }
 
-      &:disabled {
-        background: #9ca3af;
-        cursor: not-allowed;
-      }
+  button[mat-flat-button] {
+    min-width: 160px;
+    height: 40px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+
+    mat-icon {
+      margin-right: 0.35rem;
     }
   }
 }

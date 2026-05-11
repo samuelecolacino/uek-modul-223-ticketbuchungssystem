@@ -2,21 +2,30 @@ import { DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { SignalRService, TicketSoldEvent } from './signalr.service';
 import { AvailableCategory, TicketService } from './ticket.service';
 
-type ToastKind = 'success' | 'error';
-
-interface Toast {
-  kind: ToastKind;
-  message: string;
-}
-
 @Component({
   selector: 'app-ticket-list',
-  imports: [DecimalPipe],
+  imports: [
+    DecimalPipe,
+    MatButtonModule,
+    MatCardModule,
+    MatChipsModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    MatToolbarModule
+  ],
   templateUrl: './ticket-list.component.html',
   styleUrl: './ticket-list.component.scss'
 })
@@ -26,12 +35,13 @@ export class TicketListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly signalr = inject(SignalRService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly snackBar = inject(MatSnackBar);
 
   readonly categories = signal<AvailableCategory[]>([]);
   readonly loading = signal(false);
   readonly buyingCategoryId = signal<number | null>(null);
-  readonly toast = signal<Toast | null>(null);
   readonly username = computed(() => this.auth.username());
+  readonly liveConnected = this.signalr.connected;
 
   ngOnInit(): void {
     this.reload();
@@ -62,7 +72,7 @@ export class TicketListComponent implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.showToast('error', 'Tickets konnten nicht geladen werden.');
+        this.openError('Tickets konnten nicht geladen werden.');
       }
     });
   }
@@ -78,21 +88,21 @@ export class TicketListComponent implements OnInit {
     this.tickets.buy(ticketId).subscribe({
       next: response => {
         this.buyingCategoryId.set(null);
-        this.showToast('success', `Ticket #${response.ticketId} (${category.name}) erfolgreich gekauft.`);
+        this.openSuccess(`Ticket #${response.ticketId} (${category.name}) erfolgreich gekauft.`);
         this.reload();
       },
       error: (err: HttpErrorResponse) => {
         this.buyingCategoryId.set(null);
         if (err.status === 409) {
-          this.showToast('error', 'Achtung: Jemand war schneller! Bitte erneut versuchen.');
+          this.openError('Achtung: Jemand war schneller! Bitte erneut versuchen.');
         } else if (err.status === 404) {
-          this.showToast('error', 'Ticket nicht verfügbar oder bereits verkauft.');
+          this.openError('Ticket nicht verfügbar oder bereits verkauft.');
         } else if (err.status === 401) {
           this.auth.logout();
           this.router.navigateByUrl('/login');
           return;
         } else {
-          this.showToast('error', 'Kauf fehlgeschlagen. Bitte erneut versuchen.');
+          this.openError('Kauf fehlgeschlagen. Bitte erneut versuchen.');
         }
         this.reload();
       }
@@ -104,13 +114,21 @@ export class TicketListComponent implements OnInit {
     this.router.navigateByUrl('/login');
   }
 
-  private showToast(kind: ToastKind, message: string): void {
-    this.toast.set({ kind, message });
-    setTimeout(() => {
-      const current = this.toast();
-      if (current?.message === message) {
-        this.toast.set(null);
-      }
-    }, 5000);
+  private openError(message: string): void {
+    this.snackBar.open(message, 'Schliessen', {
+      duration: 5000,
+      panelClass: ['snackbar-error'],
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
+  }
+
+  private openSuccess(message: string): void {
+    this.snackBar.open(message, 'OK', {
+      duration: 3500,
+      panelClass: ['snackbar-success'],
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
   }
 }

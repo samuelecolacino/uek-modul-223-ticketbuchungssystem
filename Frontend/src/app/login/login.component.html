@@ -1,25 +1,45 @@
-<section class="login">
-  <h1>TicketShop Login</h1>
+<div class="login-shell">
+  <mat-card appearance="outlined" class="login-card">
+    <mat-card-header>
+      <mat-card-title>TicketShop</mat-card-title>
+      <mat-card-subtitle>Bitte anmelden, um Tickets zu kaufen.</mat-card-subtitle>
+    </mat-card-header>
 
-  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-    <label>
-      <span>Benutzername</span>
-      <input type="text" formControlName="username" autocomplete="username" />
-    </label>
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <mat-form-field appearance="outline">
+          <mat-label>Benutzername</mat-label>
+          <input matInput formControlName="username" autocomplete="username" />
+        </mat-form-field>
 
-    <label>
-      <span>Passwort</span>
-      <input type="password" formControlName="password" autocomplete="current-password" />
-    </label>
+        <mat-form-field appearance="outline">
+          <mat-label>Passwort</mat-label>
+          <input matInput type="password" formControlName="password" autocomplete="current-password" />
+        </mat-form-field>
 
-    @if (error()) {
-      <p class="error" role="alert">{{ error() }}</p>
-    }
+        @if (error()) {
+          <p class="error" role="alert">
+            <mat-icon aria-hidden="true">error_outline</mat-icon>
+            <span>{{ error() }}</span>
+          </p>
+        }
 
-    <button type="submit" [disabled]="form.invalid || loading()">
-      {{ loading() ? 'Lade...' : 'Anmelden' }}
-    </button>
-  </form>
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          [disabled]="form.invalid || loading()">
+          @if (loading()) {
+            <mat-progress-spinner mode="indeterminate" diameter="20" />
+          } @else {
+            <span>Anmelden</span>
+          }
+        </button>
+      </form>
+    </mat-card-content>
 
-  <p class="hint">Test-Konten: <code>admin / admin</code> &middot; <code>user / user</code></p>
-</section>
+    <mat-card-footer>
+      <p class="hint">Test-Konten: <code>admin / admin</code> · <code>user / user</code></p>
+    </mat-card-footer>
+  </mat-card>
+</div>
