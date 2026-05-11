@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using TicketShop.Api.Hubs;
 using TicketShop.Application.Tickets;
 using TicketShop.Infrastructure;
 using TicketShop.Infrastructure.Auth;
@@ -12,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSignalR();
 
 const string AngularDevCorsPolicy = "AngularDev";
 builder.Services.AddCors(options =>
@@ -19,7 +21,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy(AngularDevCorsPolicy, policy => policy
         .WithOrigins("http://localhost:4200")
         .AllowAnyHeader()
-        .AllowAnyMethod());
+        .AllowAnyMethod()
+        .AllowCredentials());
 });
 
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -96,6 +99,7 @@ app.UseCors(AngularDevCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<TicketHub>(TicketHub.Path);
 
 app.Run();
 
